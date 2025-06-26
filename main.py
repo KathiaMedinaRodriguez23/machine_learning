@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Dict, Optional
 import datetime
@@ -10,6 +11,18 @@ from sklearn.impute import SimpleImputer
 
 app = FastAPI()
 
+origins = [
+    "*",
+    # "https://upao-proyects.web.app",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # --- 1. Al arrancar, carga todo ---
 model = joblib.load("lgbm_consumption_model_v2.joblib")
 imputer: SimpleImputer = joblib.load("imputer.joblib")
