@@ -23,13 +23,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# --- 1. Al arrancar, carga todo ---
+
 model = joblib.load("lgbm_consumption_model_v2.joblib")
 imputer: SimpleImputer = joblib.load("imputer.joblib")
 feature_order = joblib.load("feature_order.joblib")
 
-
-# --- 2. Define el esquema de entrada ---
 class PredictRequest(BaseModel):
     features: Optional[Dict[str, float]] = Field(
         default_factory=dict,
@@ -41,10 +39,8 @@ class PredictRequest(BaseModel):
     )
 
 
-# --- 3. Endpoint de predicción ---
 @app.post("/predict")
 def predict(req: PredictRequest):
-    # 3.1 Arranca un dict con NaN en todas las columnas
     data = {feat: np.nan for feat in feature_order}
 
     # 3.2 Calcula el mes objetivo
