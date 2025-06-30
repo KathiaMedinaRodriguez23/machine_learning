@@ -43,18 +43,18 @@ class PredictRequest(BaseModel):
 def predict(req: PredictRequest):
     data = {feat: np.nan for feat in feature_order}
 
-    # 3.2 Calcula el mes objetivo
+    # Calcula el mes objetivo
     today = datetime.date.today()
     future_month = (today.month - 1 + req.horizon_months) % 12 + 1
     data["month"] = future_month
 
-    # 3.3 Sobreescribe con los valores que envió el usuario
+    # Sobreescribe con los valores que envió el usuario
     for k, v in req.features.items():
         if k not in data:
             return {"error": f"Feature desconocida: {k}"}
         data[k] = v
 
-    # 3.4 Construye DataFrame y aplica imputación
+    # Construye DataFrame y aplica imputación
     X = pd.DataFrame([data], columns=feature_order)
     X_imputed = pd.DataFrame(
         imputer.transform(X),
@@ -62,7 +62,7 @@ def predict(req: PredictRequest):
         index=[0]
     )
 
-    # 3.5 Predicción
+    # Predicción
     y_pred = model.predict(X_imputed)[0]
 
     return {
