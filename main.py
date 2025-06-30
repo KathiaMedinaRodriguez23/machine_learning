@@ -11,11 +11,13 @@ from sklearn.impute import SimpleImputer
 
 app = FastAPI()
 
+# Configuración de CORS
 origins = [
     "*",
     # "https://upao-proyects.web.app",
 ]
 
+# Configuración de CORS para permitir solicitudes desde cualquier origen
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -24,10 +26,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Carga del modelo
 model = joblib.load("lgbm_consumption_model_v2.joblib")
+# Carga del imputador y el orden de las características
 imputer: SimpleImputer = joblib.load("imputer.joblib")
+# Carga del orden de las características
 feature_order = joblib.load("feature_order.joblib")
 
+# Definición del modelo de Request para la predicción
 class PredictRequest(BaseModel):
     features: Optional[Dict[str, float]] = Field(
         default_factory=dict,
@@ -39,6 +45,7 @@ class PredictRequest(BaseModel):
     )
 
 
+# Endpoint para la predicción
 @app.post("/predict")
 def predict(req: PredictRequest):
     data = {feat: np.nan for feat in feature_order}
